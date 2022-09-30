@@ -1,21 +1,14 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.21)
 project(ironforge C)
 
-set(CMAKE_C_STANDARD 11)
-set(ironforge-include httpparser dependencies/libuv/include dependencies/apg-7.0/library dependencies/apg-7.0/utilities)
+set(CMAKE_C_STANDARD 23)
+set(ironforge-include dependencies/libuv/include httpparser/include)
 
 include_directories(${ironforge-include})
 
 add_subdirectory(dependencies/libuv)
+add_subdirectory(httpparser)
 
-aux_source_directory(dependencies/apg-7.0/library DIR_LIBRARY)
-add_library(library STATIC ${DIR_LIBRARY})
+add_executable(ironforge main.c)
 
-aux_source_directory(dependencies/apg-7.0/utilities DIR_UTILITIES)
-add_library(utilities STATIC ${DIR_UTILITIES})
-
-aux_source_directory(httpparser PARSER_SOURCES)
-
-add_executable(ironforge main.c ${PARSER_SOURCES})
-
-target_link_libraries(ironforge library utilities uv_a)
+target_link_libraries(ironforge uv_a httpparser)

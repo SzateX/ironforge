@@ -2,9 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <uv.h>
-
-#include <http.h>
-#include <utilities.h>
+#include <httpParserInterface.h>
 
 #define DEFAULT_PORT 7000
 #define DEFAULT_BACKLOG 128
@@ -29,7 +27,6 @@ void alloc_buffer(uv_handle_t *handle, size_t suggested_size, uv_buf_t *buf) {
 }
 
 void on_close(uv_handle_t* handle) {
-    vParserDtor(handle->data);
     free(handle);
 }
 
@@ -46,43 +43,8 @@ void echo_read(uv_stream_t *client, ssize_t nread, const uv_buf_t *buf) {
     {
         printf("%c", buf->base[i]);
     }
+    parse(buf->base);
     printf("\nECHO READ END\n");
-
-    exception e;
-
-    parser_state sState;
-    parser_config sInput;
-    apg_phrase sPhrase;
-
-
-    if (nread > 0) {
-        write_req_t *req = (write_req_t*) malloc(sizeof(write_req_t));
-        req->buf = uv_buf_init(buf->base, nread);
-
-        sPhrase.acpPhrase = (achar*)buf->base;
-        sPhrase.uiLength = buf->len;
-
-        memset((void*)&sInput, 0, sizeof(sInput));
-        sInput.acpInput = sPhrase.acpPhrase;
-        sInput.uiInputLength = sPhrase.uiLength;
-        sInput.uiStartRule = 0;
-
-        // parse the input string
-        vParserParse(client->data, &sInput, &sState);
-
-        // display the state
-        vUtilPrintParserState(&sState);
-
-        //v_write((uv_write_t*) req, client, &req->buf, 1, echo_write);
-        return;
-    }
-    if (nread < 0) {
-        if (nread != UV_EOF)
-            fprintf(stderr, "Read error %s\n", uv_err_name(nread));
-        uv_close((uv_handle_t*) client, on_close);
-    }
-
-    free(buf->base);
 }
 
 void on_new_connection(uv_stream_t *server, int status) {
@@ -92,21 +54,9 @@ void on_new_connection(uv_stream_t *server, int status) {
         return;
     }
 
-    void* vpParser = NULL;
-    exception e;
-    XCTOR(e);
-    if(e.try) {
-        vpParser = vpParserCtor(&e, vpHttpInit);
-    }
-    else{
-        vUtilPrintException(&e);
-        return;
-    }
-
     uv_tcp_t *client = (uv_tcp_t*) malloc(sizeof(uv_tcp_t));
     uv_tcp_init(loop, client);
     if (uv_accept(server, (uv_stream_t*) client) == 0) {
-        client->data = vpParser;
         uv_read_start((uv_stream_t*) client, alloc_buffer, echo_read);
     }
     else {

@@ -65,6 +65,13 @@ void on_new_connection(uv_stream_t *server, int status) {
 }
 
 int main() {
+    struct Bar {
+        int a;
+        int b;
+    } bar;
+
+    struct Bar baz;
+
     loop = uv_default_loop();
 
     uv_tcp_t server;

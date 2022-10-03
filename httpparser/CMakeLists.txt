@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.21)
+set(CMAKE_VERBOSE_MAKEFILE ON)
 project(httpparser CXX)
 
 set(CMAKE_CXX_STANDARD 11)
@@ -11,14 +12,13 @@ set(httpparser-generated_src
         ${PROJECT_SOURCE_DIR}/generated/httpParser.cpp
         )
 
-set(httpparser-src ${PROJECT_SOURCE_DIR}/src/HttpParserVisitor.cpp src/httpParserInterface.cpp)
+set(httpparser-src ${PROJECT_SOURCE_DIR}/src/HttpParserVisitor.cpp ${PROJECT_SOURCE_DIR}/src/httpParserInterface.cpp)
 
+SET(WITH_STATIC_CRT Off CACHE BOOL "" FORCE)
 add_subdirectory(antlr4-cpp-runtime-4.9.3-source)
-#find_package(antlr4-runtime REQUIRED)
 
-# set(httparser-src)
 add_library(httpparser STATIC ${httpparser-generated_src} ${httpparser-src})
-#add_dependencies( httpparser antlr4_share d )
+
 target_include_directories(httpparser
         PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
         PRIVATE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/generated>

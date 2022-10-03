@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.21)
-project(ironforge C)
+project(ironforge)
 
 set(CMAKE_C_STANDARD 23)
 set(ironforge-include dependencies/libuv/include httpparser/include)

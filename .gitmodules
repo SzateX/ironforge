@@ -2,3 +2,6 @@
 	path = dependencies/libuv
 	url = https://github.com/libuv/libuv
 	branch = v1.x
+[submodule "dependencies/HttpParser"]
+	path = dependencies/HttpParser
+	url = https://github.com/SzateX/HttpParser

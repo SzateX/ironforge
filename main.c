@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <uv.h>
-#include <httpParserInterface.h>
+#include "httpparser.h"
 
 #define DEFAULT_PORT 7000
 #define DEFAULT_BACKLOG 128
@@ -39,11 +38,24 @@ void echo_write(uv_write_t *req, int status) {
 
 void echo_read(uv_stream_t *client, ssize_t nread, const uv_buf_t *buf) {
     printf("ECHO READ START\n");
+    http_request http_request;
+    http_parser_parse(buf->base, buf->len, &http_request);
+    printf("Method: %.*s\n", http_request.method_length, http_request.method);
+    printf("Request Target: %.*s\n", http_request.target_length, http_request.target);
+    printf("Http Version: %d.%d\n", http_request.http_version.major, http_request.http_version.minor);
+
+    printf("\nHeaders (%d):\n", http_request.http_headers_count);
+    for(int i =0 ; i < http_request.http_headers_count; i++)
+    {
+        printf("(%d) Header Name: %.*s\t", i, http_request.http_headers[i].header_name_length, http_request.http_headers[i].header_name);
+        printf("Header Value: %.*s\n", http_request.http_headers[i].header_value_length, http_request.http_headers[i].header_value);
+    }
+    printf("\n\n\n");
     for(int i = 0; i < buf->len; i++)
     {
         printf("%c", buf->base[i]);
     }
-    parse(buf->base);
+
     printf("\nECHO READ END\n");
 }
 
@@ -65,13 +77,7 @@ void on_new_connection(uv_stream_t *server, int status) {
 }
 
 int main() {
-    struct Bar {
-        int a;
-        int b;
-    } bar;
-
-    struct Bar baz;
-
+    http_parser_init();
     loop = uv_default_loop();
 
     uv_tcp_t server;

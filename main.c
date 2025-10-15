@@ -15,9 +15,9 @@ struct sockaddr_in addr;
 static const char mock_response[] =
         "HTTP/1.1 200 OK\r\n"
         "Connection: close\r\n"
-        "Content-Length: 41\r\n"
+        "Content-Length: 194\r\n"
         "\r\n"
-        "<html><head></head><body>OK</body></html>";
+        "<html><head></head><body>HENLO WORLD<br><img src=\"https://www.alphapaw.com/wp-content/uploads/2021/01/Golden-Retriever-Meme-Another-movie-night-in-my-pjs-enjoying-my-pup-corn.jpg\"></body></html>";
 
 typedef struct {
     uv_write_t req;

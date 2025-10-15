@@ -1,9 +1,0 @@
-[submodule "dependencies/libuv"]
-	path = dependencies/libuv
-	url = https://github.com/libuv/libuv
-	branch = v1.x
-
-[submodule "dependencies/llhttp"]
-	path = dependencies/llhttp
-	url = https://github.com/nodejs/llhttp
-	branch = v8.x
